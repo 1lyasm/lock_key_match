@@ -18,7 +18,7 @@ void swap(int *a, int *b) {
   *b = tmp;
 }
 
-int partition(int *arr, int pivot, int start, int end) {
+int partition(int *arr, int *ids, int pivot, int start, int end) {
   int i = start;
   int j = start;
   while (j < end) {
@@ -26,8 +26,10 @@ int partition(int *arr, int pivot, int start, int end) {
     if (arr[j] == pivot) {
       isPivot = 1;
       swap(&arr[j], &arr[end]);
+      swap(&ids[j], &ids[end]);
     } else if (arr[j] < pivot) {
       swap(&arr[i], &arr[j]);
+      swap(&ids[i], &ids[j]);
       ++i;
     }
     if (!isPivot) {
@@ -35,10 +37,11 @@ int partition(int *arr, int pivot, int start, int end) {
     }
   }
   swap(&arr[i], &arr[end]);
+  swap(&ids[i], &ids[end]);
   return i;
 }
 
-void sort(int *key, int *lock, int start, int end) {
+void sort(int *key, int *keyIds, int *lock, int *lockIds, int start, int end) {
   int randKeyPos;
   int keyPivot;
   int lockPivotPos;
@@ -48,18 +51,44 @@ void sort(int *key, int *lock, int start, int end) {
   }
   randKeyPos = start + rand() % (end - start);
   keyPivot = key[randKeyPos];
-  lockPivotPos = partition(lock, keyPivot, start, end);
+  lockPivotPos = partition(lock, lockIds, keyPivot, start, end);
   lockPivot = lock[lockPivotPos];
-  partition(key, lockPivot, start, end);
-  sort(key, lock, start, lockPivotPos - 1);
-  sort(key, lock, lockPivotPos + 1, end);
+  partition(key, keyIds, lockPivot, start, end);
+  sort(key, keyIds, lock, lockIds, start, lockPivotPos - 1);
+  sort(key, keyIds, lock, lockIds, lockPivotPos + 1, end);
 }
 
-void assertArrEq(int *arr1, int *arr2, int len) {
-  int i;
-  for (i = 0; i < len; ++i) {
-    assert(arr1[i] == arr2[i]);
-  }
+int *makeIds(int n) {
+    int i;
+    int *ids = malloc(n * sizeof(int));
+    if (!ids) {
+        fprintf(stderr, "malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    for (i = 0; i < n; ++i) {
+        ids[i] = i;
+    }
+    return ids;
+}
+
+void printMatches(int *lockIds, int *keyIds, int n) {
+
+}
+
+void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted, int n, int is_after) {
+    if (is_after) {
+        printf("after\n");
+    } else {
+        printf("before\n");
+    }
+    printArr("lock array", lock, n);
+    printArr("lock id array", lockIds, n);
+    printArr("key array", key, n);
+    printArr("key id array", keyIds, n);
+    printArr("expected sorted array", sorted, n);
+    if (is_after) {
+        printMatches(lockIds, keyIds, n);
+    }
 }
 
 int main() {
@@ -69,28 +98,26 @@ int main() {
     int key[] = {5, 2, 4, 3, 1};
     int n = sizeof(lock) / sizeof(lock[0]);
     int sorted[] = {1, 2, 3, 4, 5};
-    printArr("key array before match", key, n);
-    printArr("lock array before match", lock, n);
-    sort(key, lock, 0, n - 1);
-    printArr("key array after match", key, n);
-    printArr("lock array after match", lock, n);
-    assertArrEq(lock, sorted, n);
-    assertArrEq(key, sorted, n);
-    printf("\n");
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
   }
   {
     int lock[] = {4, 3, 5, 1, 2};
     int key[] = {2, 5, 4, 3, 1};
     int n = sizeof(lock) / sizeof(lock[0]);
     int sorted[] = {1, 2, 3, 4, 5};
-    printArr("key array before match", key, n);
-    printArr("lock array before match", lock, n);
-    sort(key, lock, 0, n - 1);
-    printArr("key array after match", key, n);
-    printArr("lock array after match", lock, n);
-    assertArrEq(lock, sorted, n);
-    assertArrEq(key, sorted, n);
-    printf("\n");
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
   }
   return 0;
 }
