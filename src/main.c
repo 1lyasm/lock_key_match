@@ -62,9 +62,9 @@ int partition(int *arr, int *ids, int pivot, int start, int end) {
                  // arr[j]
   int j = start; // Index on the right side that looks for a
                  // value that is lower than or equal to the pivot value
-  while (j < end) { // Last element will be the pivot value during the loop, so
-                    // iterate until j is equal to end
-    int isPivot = 0;       // Value that is 1 if arr[j] is pivot value itself
+  while (j < end) {  // Last element will be the pivot value during the loop, so
+                     // iterate until j is equal to end
+    int isPivot = 0; // Value that is 1 if arr[j] is pivot value itself
     if (arr[j] == pivot) { // Check if it is pivot value
       isPivot = 1;         // Set isPivot to 1 to be later used
       swap(&arr[j],
@@ -222,6 +222,7 @@ void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted,
 int main() {
   srand((unsigned)time(0)); // Seed random number generator using time function
   {
+    printf("--------  1  --------\n");
     int lock[] = {2, 1, 4, 5,
                   3}; // Example lock values that represent radius of the locks
     int key[] = {5, 2, 4, 3, 1};
@@ -239,6 +240,7 @@ int main() {
     free(keyIds);
   }
   {
+    printf("--------  2  --------\n");
     int lock[] = {4, 3, 5, 1, 2};
     int key[] = {2, 5, 4, 3, 1};
     int n = sizeof(lock) / sizeof(lock[0]);
@@ -251,5 +253,76 @@ int main() {
     free(lockIds);
     free(keyIds);
   }
+  {
+    printf("--------  3  --------\n");
+    int lock[] = {6, 5, 4, 3, 2, 1};
+    int key[] = {6, 5, 4, 3, 2, 1};
+    int n = sizeof(lock) / sizeof(lock[0]);
+    int sorted[] = {1, 2, 3, 4, 5, 6};
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
+  }
+  {
+    printf("--------  4  --------\n");
+    int lock[] = {};
+    int key[] = {};
+    int n = sizeof(lock) / sizeof(lock[0]);
+    int sorted[] = {};
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
+  }
+  {
+    printf("--------  5  --------\n");
+    int lock[] = {1};
+    int key[] = {1};
+    int n = sizeof(lock) / sizeof(lock[0]);
+    int sorted[] = {1};
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
+  }
+  {
+    printf("--------  6  --------\n");
+    int lock[] = {2, 1};
+    int key[] = {2, 1};
+    int n = sizeof(lock) / sizeof(lock[0]);
+    int sorted[] = {1, 2};
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
+  }
+  {
+    printf("--------  7  --------\n");
+    int lock[] = {1, 2, 3};
+    int key[] = {1, 2, 3};
+    int n = sizeof(lock) / sizeof(lock[0]);
+    int sorted[] = {1, 2, 3};
+    int *lockIds = makeIds(n);
+    int *keyIds = makeIds(n);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
+    sort(key, keyIds, lock, lockIds, 0, n - 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    free(lockIds);
+    free(keyIds);
+  }
+
   return 0;
 }
