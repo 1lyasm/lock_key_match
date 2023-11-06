@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 /*
  In this document, there is the solution to the second problem in homework 2.
- It solves classic nuts and bolts (in this case, locks and keys) matching problem
-    using divide and conquer approach in O(n * logn) time. Solution progressively
-    sorts both of the locks and keys arrays by partitioning them using other
-    array's element as pivot and continues to do so by recursively calling itself
-    on the ranges that are to the left and right of the newly found pivot position.
+ It solves classic nuts and bolts (in this case, locks and keys) matching
+ problem using divide and conquer approach in O(n * logn) time. Solution
+ progressively sorts both of the locks and keys arrays by partitioning them
+ using other array's element as pivot and continues to do so by recursively
+ calling itself on the ranges that are to the left and right of the newly found
+ pivot position.
 */
 
 /*
@@ -23,12 +23,12 @@
  @return
 */
 void printArr(char *msg, int *arr, int len) {
-  int i;
-  printf("%s: ", msg);
-  for (i = 0; i < len; ++i) {
-    printf("%d ", arr[i]);
+  int i;               // Counter that will be used to iterate over the array
+  printf("%s: ", msg); // Print the message by using formatting
+  for (i = 0; i < len; ++i) { // Iterate over the array
+    printf("%d ", arr[i]);    // Print i'th element of the array
   }
-  printf("\n");
+  printf("\n"); // Print newline
 }
 
 /*
@@ -40,9 +40,9 @@ void printArr(char *msg, int *arr, int len) {
  @return
 */
 void swap(int *a, int *b) {
-  int tmp = *a;
-  *a = *b;
-  *b = tmp;
+  int tmp = *a; // Put value pointed by a to a temporary variable
+  *a = *b; // Update value of memory location pointed by a to value pointed by b
+  *b = tmp; // Update value of b
 }
 
 /*
@@ -58,26 +58,43 @@ void swap(int *a, int *b) {
  @return Index that pivot is placed
 */
 int partition(int *arr, int *ids, int pivot, int start, int end) {
-  int i = start;
-  int j = start;
-  while (j < end) {
-    int isPivot = 0;
-    if (arr[j] == pivot) {
-      isPivot = 1;
-      swap(&arr[j], &arr[end]);
-      swap(&ids[j], &ids[end]);
-    } else if (arr[j] < pivot) {
-      swap(&arr[i], &arr[j]);
+  int i = start; // Index on the left side that will be used to swap arr[i] and
+                 // arr[j]
+  int j = start; // Index on the right side that looks for a
+                 // value that is lower than or equal to the pivot value
+  while (j < end) { // Last element will be the pivot value during the loop, so
+                    // iterate until j is equal to end
+    int isPivot = 0;       // Value that is 1 if arr[j] is pivot value itself
+    if (arr[j] == pivot) { // Check if it is pivot value
+      isPivot = 1;         // Set isPivot to 1 to be later used
+      swap(&arr[j],
+           &arr[end]); // Swap current index (that has pivot value) with end of
+                       // array, this is like changing the array so that it
+                       // looks more like other partition schemes where pivot is
+                       // the last element
+      swap(&ids[j], &ids[end]); // Whenever something is swapped in the array,
+                                // corresponding indices must also be swapped in
+                                // id array to not lose id information
+    } else if (arr[j] <
+               pivot) { // Check if right iterator has value less than pivot
+      swap(&arr[i],
+           &arr[j]); // Swap indices i and j, i is wanted to be brought
+                     // to over the element that is more than pivot,
+                     // and j is brought to over element that has is less
       swap(&ids[i], &ids[j]);
-      ++i;
+      ++i; // Update i to point to the next item so that it may point to larger
+           // value than pivot
     }
-    if (!isPivot) {
-      ++j;
+    if (!isPivot) { // Check if value looked at in this iteration was pivot
+      ++j; // Update j to the next item, do not update if it was pivot because,
+           // it is not wanted to go over the newly brought value from end of
+           // array
     }
   }
-  swap(&arr[i], &arr[end]);
+  swap(&arr[i], &arr[end]); // Insert the pivot from end of array to its correct
+                            // position i
   swap(&ids[i], &ids[end]);
-  return i;
+  return i; // Return correct pivot position of pivot value
 }
 
 /*
@@ -95,20 +112,32 @@ int partition(int *arr, int *ids, int pivot, int start, int end) {
  @return
 */
 void sort(int *key, int *keyIds, int *lock, int *lockIds, int start, int end) {
-  int randKeyPos;
-  int keyPivot;
-  int lockPivotPos;
-  int lockPivot;
-  if (start >= end) {
+  int randKeyPos;     // Random index to choose a key
+  int keyPivot;       // Value of the random pivot from keys
+  int lockPivotPos;   // Index of the pivot from locks
+  int lockPivot;      // Value of the pivot from locks
+  if (start >= end) { // Range has no elements, return
     return;
   }
-  randKeyPos = start + rand() % (end - start);
-  keyPivot = key[randKeyPos];
-  lockPivotPos = partition(lock, lockIds, keyPivot, start, end);
-  lockPivot = lock[lockPivotPos];
-  partition(key, keyIds, lockPivot, start, end);
-  sort(key, keyIds, lock, lockIds, start, lockPivotPos - 1);
-  sort(key, keyIds, lock, lockIds, lockPivotPos + 1, end);
+  randKeyPos = start + rand() % (end - start); // Choose a random index
+                                               // from the range [start, end]
+  keyPivot = key[randKeyPos]; // Take value of random pivot from keys
+  lockPivotPos = partition(lock, lockIds, keyPivot, start,
+                           end);  // Partition the locks array
+                                  // using the pivot value from keys,
+                                  // and take correct position of pivot
+  lockPivot = lock[lockPivotPos]; // Using the newly found position of pivot in
+                                  // locks, take its value
+  partition(key, keyIds, lockPivot, start,
+            end); // Partition the keys array
+                  // using the pivot value from locks array,
+                  // return value is no longer needed
+  sort(key, keyIds, lock, lockIds, start,
+       lockPivotPos - 1); // Call this function on left side of the pivot,
+                          // index of the pivot is same in both keys and locks,
+                          // because, all values are unique
+  sort(key, keyIds, lock, lockIds, lockPivotPos + 1,
+       end); // Call this function on right side of the pivot
 }
 
 /*
@@ -120,16 +149,16 @@ void sort(int *key, int *keyIds, int *lock, int *lockIds, int start, int end) {
  @return Pointer to the newly allocated array
 */
 int *makeIds(int n) {
-  int i;
-  int *ids = malloc(n * sizeof(int));
-  if (!ids) {
+  int i;                              // Iterator over the ids array
+  int *ids = malloc(n * sizeof(int)); // Allocate n ints
+  if (!ids) {                         // Exit if malloc fails
     fprintf(stderr, "malloc failed");
     exit(EXIT_FAILURE);
   }
   for (i = 0; i < n; ++i) {
-    ids[i] = i;
+    ids[i] = i; // Set each element of ids to its index
   }
-  return ids;
+  return ids; // Return pointer to first element of ids array
 }
 
 /*
@@ -144,7 +173,9 @@ int *makeIds(int n) {
 void printMatches(int *lockIds, int *keyIds, int n) {
   int i;
   for (i = 0; i < n; ++i) {
-    printf("key %d <-> lock %d\n", keyIds[i], lockIds[i]);
+    printf("key %d <-> lock %d\n", keyIds[i],
+           lockIds[i]); // keyIds[i] and lockIds[i]
+                        // are ids of the key and lock that match
   }
 }
 
@@ -164,7 +195,8 @@ void printMatches(int *lockIds, int *keyIds, int n) {
 */
 void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted,
               int n, int isAfter) {
-  if (isAfter) {
+  if (isAfter) { // Print corresponding message depending on whether
+                 // function is called before or after
     printf("After:\n");
   } else {
     printf("Before:\n");
@@ -174,7 +206,7 @@ void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted,
   printArr("key array", key, n);
   printArr("key id array", keyIds, n);
   printArr("expected sorted array", sorted, n);
-  if (isAfter) {
+  if (isAfter) { // If function is called after matching is done, print matches
     printf("\nMatches:\n");
     printMatches(lockIds, keyIds, n);
   }
@@ -182,22 +214,27 @@ void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted,
 }
 
 /*
- @brief Main function that calls matching sort function with different inputs and
-        prints relevant information about inputs and outputs
- @return Returns 0, indicating that process exited succesfully, if everytihg went ok
+ @brief Main function that calls matching sort function with different inputs
+ and prints relevant information about inputs and outputs
+ @return Returns 0, indicating that process exited succesfully, if everytihg
+ went ok
 */
 int main() {
-  srand((unsigned)time(0));
+  srand((unsigned)time(0)); // Seed random number generator using time function
   {
-    int lock[] = {2, 1, 4, 5, 3};
+    int lock[] = {2, 1, 4, 5,
+                  3}; // Example lock values that represent radius of the locks
     int key[] = {5, 2, 4, 3, 1};
-    int n = sizeof(lock) / sizeof(lock[0]);
-    int sorted[] = {1, 2, 3, 4, 5};
-    int *lockIds = makeIds(n);
+    int n =
+        sizeof(lock) / sizeof(lock[0]); // Number of elements in locks and keys
+    int sorted[] = {1, 2, 3, 4, 5};     // Sorted expected output
+    int *lockIds =
+        makeIds(n); // Initialize ids with increasing numbers in [0, n - 1]
     int *keyIds = makeIds(n);
-    printAll(lock, lockIds, key, keyIds, sorted, n, 0);
-    sort(key, keyIds, lock, lockIds, 0, n - 1);
-    printAll(lock, lockIds, key, keyIds, sorted, n, 1);
+    printAll(lock, lockIds, key, keyIds, sorted, n, 0); // Print all inputs
+    sort(key, keyIds, lock, lockIds, 0, n - 1); // Call the matcher function
+    printAll(lock, lockIds, key, keyIds, sorted, n,
+             1); // Print resulting state of inputs
     free(lockIds);
     free(keyIds);
   }
