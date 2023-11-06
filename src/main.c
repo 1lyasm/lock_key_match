@@ -72,14 +72,17 @@ int *makeIds(int n) {
 }
 
 void printMatches(int *lockIds, int *keyIds, int n) {
-
+    int i;
+    for (i = 0; i < n; ++i) {
+        printf("lock %d <-> key %d\n", lockIds[i], keyIds[i]);
+    }
 }
 
 void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted, int n, int is_after) {
     if (is_after) {
-        printf("after\n");
+        printf("After:\n");
     } else {
-        printf("before\n");
+        printf("Before:\n");
     }
     printArr("lock array", lock, n);
     printArr("lock id array", lockIds, n);
@@ -87,8 +90,10 @@ void printAll(int *lock, int *lockIds, int *key, int *keyIds, int *sorted, int n
     printArr("key id array", keyIds, n);
     printArr("expected sorted array", sorted, n);
     if (is_after) {
+        printf("\nMatches:\n");
         printMatches(lockIds, keyIds, n);
     }
+    printf("\n");
 }
 
 int main() {
